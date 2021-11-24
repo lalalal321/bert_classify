@@ -21,6 +21,7 @@ from transformers import BertTokenizer
 MODEL_NAME = "./bert-medium"
 NUM_LABELS = 4
 MAX_LEN = 1500
+EPOCHS = 10
 BATCH_SIZE = 16
 tokenizer = BertTokenizer.from_pretrained(MODEL_NAME)
 model = BertForSequenceClassification.from_pretrained(MODEL_NAME, num_labels=NUM_LABELS)
@@ -162,8 +163,6 @@ if __name__ == '__main__':
 
     start = time.time()
     train_acc = []
-
-    EPOCHS = 2
     for epoch in range(EPOCHS):
 
         running_loss = 0.0
