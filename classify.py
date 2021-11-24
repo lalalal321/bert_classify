@@ -18,11 +18,14 @@ from torch.utils.data import Dataset
 from transformers import BertForSequenceClassification
 from transformers import BertTokenizer
 
+
+test_data = "./data/test_B23.csv"
+train_data = "./data/train_B23.csv"
 MODEL_NAME = "./bert-medium"
 NUM_LABELS = 4
+EPOCHS = 1
 MAX_LEN = 1500
 BATCH_SIZE = 16
-EPOCHS = 10
 label_dict = {}
 tokenizer = BertTokenizer.from_pretrained(MODEL_NAME)
 
@@ -126,8 +129,8 @@ def get_predictions(model, dataloader, compute_acc=False):
 
 
 if __name__ == '__main__':
-    df_data = pd.read_csv("./data/train_B23.csv")
-    df_test_data = pd.read_csv("./data/test_B23.csv")
+    df_data = pd.read_csv(train_data)
+    df_test_data = pd.read_csv(test_data)
 
     # 标签
     labels = df_test_data["IPC"].unique()
@@ -166,9 +169,7 @@ if __name__ == '__main__':
 
     start = time.time()
     train_acc = []
-
     for epoch in range(EPOCHS):
-
         running_loss = 0.0
         step, steps = 0, len(df_data) // BATCH_SIZE
         for data in train_loader:
@@ -198,3 +199,4 @@ if __name__ == '__main__':
     end = time.time()
     print(f"time:{end - start:.2f}")
     plt.plot([i + 1 for i in range(EPOCHS)], train_acc)
+    plt.show()
