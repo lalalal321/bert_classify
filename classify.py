@@ -22,6 +22,7 @@ MODEL_NAME = "./bert-medium"
 NUM_LABELS = 4
 MAX_LEN = 1500
 BATCH_SIZE = 16
+EPOCHS = 10
 label_dict = {}
 tokenizer = BertTokenizer.from_pretrained(MODEL_NAME)
 
@@ -166,7 +167,6 @@ if __name__ == '__main__':
     start = time.time()
     train_acc = []
 
-    EPOCHS = 2
     for epoch in range(EPOCHS):
 
         running_loss = 0.0
