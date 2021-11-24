@@ -21,10 +21,9 @@ from transformers import BertTokenizer
 MODEL_NAME = "./bert-medium"
 NUM_LABELS = 4
 MAX_LEN = 1500
-EPOCHS = 10
 BATCH_SIZE = 16
+label_dict = {}
 tokenizer = BertTokenizer.from_pretrained(MODEL_NAME)
-model = BertForSequenceClassification.from_pretrained(MODEL_NAME, num_labels=NUM_LABELS)
 
 
 def get_learnable_params(module):
@@ -69,14 +68,7 @@ class MyDataset(Dataset):
 
 
 def my_label(ipc_label):
-    if ipc_label == "A":
-        return 0
-    if ipc_label == "B":
-        return 1
-    if ipc_label == "G":
-        return 2
-    if ipc_label == "H":
-        return 3
+    return label_dict[ipc_label]
 
 
 def create_mini_batch(samples):
@@ -133,8 +125,16 @@ def get_predictions(model, dataloader, compute_acc=False):
 
 
 if __name__ == '__main__':
-    df_data = pd.read_csv("./data/train4.csv")
-    df_test_data = pd.read_csv("./data/test4.csv")
+    df_data = pd.read_csv("./data/train_B23.csv")
+    df_test_data = pd.read_csv("./data/test_B23.csv")
+
+    # 标签
+    labels = df_test_data["IPC"].unique()
+    NUM_LABELS = len(labels)
+    count = 0
+    for label in labels:
+        label_dict[label] = count
+        count += 1
 
     df_data["length"] = df_data["title"].str.len() + df_data["abstract"].str.len()
     df_data["text"] = df_data["title"] + df_data["abstract"]
@@ -155,6 +155,8 @@ if __name__ == '__main__':
     train_loader = DataLoader(train_set, batch_size=BATCH_SIZE, collate_fn=create_mini_batch)
     test_loader = DataLoader(test_set, batch_size=BATCH_SIZE, collate_fn=create_mini_batch)
 
+    # 模型相关
+    model = BertForSequenceClassification.from_pretrained(MODEL_NAME, num_labels=NUM_LABELS)
     model_params = get_learnable_params(model)
     optimizer = torch.optim.Adam(model_params, lr=5e-5)
 
@@ -163,6 +165,8 @@ if __name__ == '__main__':
 
     start = time.time()
     train_acc = []
+
+    EPOCHS = 2
     for epoch in range(EPOCHS):
 
         running_loss = 0.0
